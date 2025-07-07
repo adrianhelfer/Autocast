@@ -2676,7 +2676,7 @@
 		(uuid "30f7bf86-99c4-49a8-8fec-64236c9fc20c")
 	)
 	(label "p"
-		(at 153.67 125.73 0)
+		(at 153.67 123.19 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2746,7 +2746,7 @@
 		(uuid "7ce4761c-e6fa-4f40-aa71-8087fc38eb33")
 	)
 	(label "d"
-		(at 153.67 68.58 0)
+		(at 153.67 128.27 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2806,7 +2806,7 @@
 		(uuid "9d198cbe-3422-4a83-a636-024f43f2a938")
 	)
 	(label "c"
-		(at 153.67 123.19 0)
+		(at 153.67 68.58 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2906,7 +2906,7 @@
 		(uuid "ca865ce4-c1eb-4b0f-8f60-378fb44bb61f")
 	)
 	(label "e"
-		(at 153.67 128.27 0)
+		(at 153.67 125.73 0)
 		(effects
 			(font
 				(size 1.27 1.27)
