@@ -9970,7 +9970,7 @@
 		)
 	)
 	(sheet
-		(at 83.82 26.67)
+		(at 58.42 26.67)
 		(size 25.4 25.4)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -9985,8 +9985,8 @@
 			(color 0 0 0 0.0000)
 		)
 		(uuid "1f12f0f8-c214-4390-a9e8-6644e3af2917")
-		(property "Sheetname" "Digit3"
-			(at 83.82 25.9584 0)
+		(property "Sheetname" "Digit2"
+			(at 58.42 25.9584 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9995,7 +9995,7 @@
 			)
 		)
 		(property "Sheetfile" "Digit.kicad_sch"
-			(at 83.82 52.6546 0)
+			(at 58.42 52.6546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10004,7 +10004,7 @@
 			)
 		)
 		(pin "QH'" output
-			(at 109.22 39.37 0)
+			(at 83.82 39.37 0)
 			(uuid "270d267a-af65-4f2a-8057-56d216d2fcbc")
 			(effects
 				(font
@@ -10014,7 +10014,7 @@
 			)
 		)
 		(pin "SERIAL" input
-			(at 83.82 39.37 180)
+			(at 58.42 39.37 180)
 			(uuid "3776264f-4972-4029-bcb1-d9e1493911f6")
 			(effects
 				(font
@@ -11086,7 +11086,7 @@
 		)
 	)
 	(sheet
-		(at 58.42 26.67)
+		(at 83.82 26.67)
 		(size 25.4 25.4)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11101,8 +11101,8 @@
 			(color 0 0 0 0.0000)
 		)
 		(uuid "d993916a-44bd-4e98-a569-a14ea7f2ad92")
-		(property "Sheetname" "Digit2"
-			(at 58.42 25.9584 0)
+		(property "Sheetname" "Digit3"
+			(at 83.82 25.9584 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11111,7 +11111,7 @@
 			)
 		)
 		(property "Sheetfile" "Digit.kicad_sch"
-			(at 58.42 52.6546 0)
+			(at 83.82 52.6546 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11120,7 +11120,7 @@
 			)
 		)
 		(pin "QH'" output
-			(at 83.82 39.37 0)
+			(at 109.22 39.37 0)
 			(uuid "8086a822-4aba-458a-a250-45a6f7807ba9")
 			(effects
 				(font
@@ -11130,7 +11130,7 @@
 			)
 		)
 		(pin "SERIAL" input
-			(at 58.42 39.37 180)
+			(at 83.82 39.37 180)
 			(uuid "7e161466-fe97-44fd-9bc0-6c7eac6baf29")
 			(effects
 				(font
