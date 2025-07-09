@@ -5,7 +5,7 @@
 	(layer "F.Cu")
 	(property "Reference" "REF**"
 		(at 0.635 -5.969 0)
-		(layer "F.SilkS")
+		(layer "F.Fab")
 		(uuid "1f9c56b5-3111-4232-ae27-4d1537d0a718")
 		(effects
 			(font
@@ -245,4 +245,15 @@
 		(uuid "6adaffa4-4544-4ab6-b7a6-7babc86bd0ac")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3D-Models/TL2230EEF100.STEP"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
 )

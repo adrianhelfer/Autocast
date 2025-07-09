@@ -1203,4 +1203,15 @@
 		(uuid "1c96158b-5666-44c8-9ebb-bb46e4dad6f2")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/3D-Models/ACPSX04-41.STEP"
+		(offset
+			(xyz 0 0 3.7)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 90 -180 -180)
+		)
+	)
 )
