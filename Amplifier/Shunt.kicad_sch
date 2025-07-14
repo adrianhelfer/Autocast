@@ -1162,6 +1162,15 @@
 				(hide yes)
 			)
 		)
+		(property "DigiKey Part #" "INA226AIDGSR"
+			(at 152.4 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "6"
 			(uuid "dbb81024-ca19-4e66-90be-f5f1e13b40c3")
 		)
