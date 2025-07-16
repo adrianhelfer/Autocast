@@ -14,3 +14,6 @@ Amplifier/Amplifier.kicad_prl
 PSU_EVT/fp-lib-table
 /PSU_EVT/PSU_EVT-backups
 PSU_EVT/fp-info-cache
+/Playback_Control_EVT/Playback_Control_EVT-backups
+Playback_Control_EVT/fp-info-cache
+Playback_Control_EVT/fp-lib-table

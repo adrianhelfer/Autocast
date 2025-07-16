@@ -1,10 +1,12 @@
 {
   "board": {
-    "active_layer": 2,
+    "active_layer": 25,
     "active_layer_preset": "",
     "auto_track_width": true,
     "hidden_netclasses": [],
-    "hidden_nets": [],
+    "hidden_nets": [
+      "GND"
+    ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
     "opacity": {
@@ -59,7 +61,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "PSU_EVT.kicad_prl",
+    "filename": "Playback_Control_EVT.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
