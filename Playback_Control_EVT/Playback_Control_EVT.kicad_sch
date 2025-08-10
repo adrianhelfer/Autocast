@@ -4778,7 +4778,7 @@
 		(at 97.79 77.47 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -5086,7 +5086,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "268e1113-7a5a-4eab-a344-42f3e747a466")
@@ -5404,6 +5404,15 @@
 		)
 		(property "Description" "Resistor"
 			(at 182.88 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 182.88 86.36 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6224,6 +6233,15 @@
 				(hide yes)
 			)
 		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 182.88 52.07 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "81df6d9a-5793-4859-8993-1cdeb53902e9")
 		)
@@ -6245,7 +6263,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "74cb7d45-3b01-494f-a015-b30bf96bcd56")
@@ -6317,7 +6335,7 @@
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(uuid "7d45b0bb-b584-49f3-944a-b2269f8862df")
@@ -6454,7 +6472,7 @@
 		(at 143.51 81.28 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -6685,7 +6703,7 @@
 		(at 101.6 97.79 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
@@ -6867,6 +6885,15 @@
 		)
 		(property "Description" "Resistor"
 			(at 182.88 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 182.88 121.92 90)
 			(effects
 				(font
 					(size 1.27 1.27)

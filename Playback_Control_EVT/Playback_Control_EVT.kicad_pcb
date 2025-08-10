@@ -1146,6 +1146,19 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 0 0 90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2b3c6a88-d896-454d-b416-cc4bb1a87945")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "R_*")
 		(path "/88f1a648-b4a9-465c-a9eb-09e74206935f")
 		(sheetname "/")
@@ -1316,6 +1329,19 @@
 			(effects
 				(font
 					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 0 0 90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "dc94792d-9eab-4909-99fd-b699e2ae0a36")
+			(effects
+				(font
+					(size 1 1)
 					(thickness 0.15)
 				)
 			)
@@ -3084,6 +3110,19 @@
 			(effects
 				(font
 					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "DigiKey Part #" "CF18JT680RCT-ND"
+			(at 0 0 90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0500aa12-b28e-43a3-802d-9e700eb2d357")
+			(effects
+				(font
+					(size 1 1)
 					(thickness 0.15)
 				)
 			)
