@@ -17,3 +17,5 @@ PSU_EVT/fp-info-cache
 /Playback_Control_EVT/Playback_Control_EVT-backups
 Playback_Control_EVT/fp-info-cache
 Playback_Control_EVT/fp-lib-table
+/Systemboard/Systemboard-backups
+Systemboard/Systemboard.kicad_prl
