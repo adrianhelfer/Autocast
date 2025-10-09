@@ -19,3 +19,7 @@ Playback_Control_EVT/fp-info-cache
 Playback_Control_EVT/fp-lib-table
 /Systemboard/Systemboard-backups
 Systemboard/Systemboard.kicad_prl
+Display/Display_Control_EVT/fp-info-cache
+/Display/Display_Control_EVT/Display_Control_EVT-backups
+Display/Display_Control_EVT/Display_Control_EVT.kicad_prl
+Display/Display_Control_EVT/fp-lib-table
