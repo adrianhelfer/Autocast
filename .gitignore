@@ -23,3 +23,10 @@ Display/Display_Control_EVT/fp-info-cache
 /Display/Display_Control_EVT/Display_Control_EVT-backups
 Display/Display_Control_EVT/Display_Control_EVT.kicad_prl
 Display/Display_Control_EVT/fp-lib-table
+DAC_EVT/fp-lib-table
+DAC_EVT/fp-info-cache
+DAC_EVT/sym-lib-table
+DAC_EVT/silkscreen/template.afdesign
+DAC_EVT/DAC_EVT.kicad_prl
+/DAC_EVT/DAC_EVT-backups
+DAC_EVT/external_components.bak
