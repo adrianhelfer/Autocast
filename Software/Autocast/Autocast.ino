@@ -1,15 +1,182 @@
+/*
+ * Autocast input selection state machine
+ * ----------------------------------------
+ * Reads two digital sensor pins (SENSOR_VP_PIN, SENSOR_VN_PIN) and derives
+ * a logical input-selection state: OFF, BLUETOOTH, USB, or ERROR_STATE.
+ *
+ * A counting-style debounce requires DEBOUNCE_THRESHOLD consecutive
+ * samples (taken every SAMPLE_INTERVAL_MS) to agree before a state
+ * transition is committed. This prevents brief electrical noise or
+ * switch bounce on the pins from causing spurious mode switches.
+ *
+ * Each state has a defined entry point (enterXxxMode), exit point
+ * (exitXxxMode), and per-loop worker (runXxxMode) — fill these in with
+ * your Bluetooth / USB / power-down logic.
+ *
+ * NOTE ON STRUCTURE: all custom types (enums/structs) are defined right
+ * after the includes, and every function has an explicit forward
+ * declaration placed immediately after that. This sidesteps a classic
+ * Arduino IDE issue: the IDE auto-generates its own function prototypes
+ * and inserts them near the top of the translation unit, *before* any
+ * custom type defined further down — which breaks with "X does not name
+ * a type" for any function that takes/returns a custom enum or struct.
+ * Supplying the prototypes ourselves, after the types, prevents the IDE
+ * from inserting its own (broken) versions.
+ */
+
+#include <Arduino.h>
 #include "BluetoothA2DPSink.h"
 #include "AutocastDisplay.h"
 
-BluetoothA2DPSink a2dp_sink;
-AutocastDisplay display;
+// ---------------------------------------------------------------------
+// Pin definitions
+// ---------------------------------------------------------------------
+const uint8_t SENSOR_VP_PIN = 36;   // adjust to your actual wiring
+const uint8_t SENSOR_VN_PIN = 39;
 
-int last_volume, current_volume;
+// =======================================================================
+// TYPE DEFINITIONS (must precede all forward declarations / function use)
+// =======================================================================
+
+// ---- Top-level input selection state ----
+enum class InputSelection : uint8_t {
+  OFF,
+  BLUETOOTH,
+  USB,
+  ERROR_STATE
+};
+
+// ---- Bluetooth-mode-local display state ----
+enum bt_display_information_t {
+  BT_NOT_CONNECTED,
+  BT_NOW_PLAYING,
+  BT_VOLUME_OVERLAY
+};
 
 struct TrackInfo {
   String title = "";
   String artist = "";
-} currentTrack;
+};
+
+// =======================================================================
+// FORWARD DECLARATIONS
+// =======================================================================
+
+// ---- State machine core ----
+InputSelection decodeState(int vpState, int vnState);
+void enterState(InputSelection s);
+void exitState(InputSelection s);
+void runState(InputSelection s);
+
+// ---- OFF ----
+void enterOffMode();
+void exitOffMode();
+void runOffMode();
+
+// ---- BLUETOOTH ----
+void enterBluetoothMode();
+void exitBluetoothMode();
+void runBluetoothMode();
+void avrc_metadata_callback(uint8_t id, const uint8_t* text);
+void connection_state_changed(esp_a2d_connection_state_t state, void* ptr);
+void audio_state_changed(esp_a2d_audio_state_t state, void* ptr);
+
+// ---- USB ----
+void enterUsbMode();
+void exitUsbMode();
+void runUsbMode();
+
+// ---- ERROR ----
+void enterErrorMode();
+void exitErrorMode();
+void runErrorMode();
+
+// =======================================================================
+// GLOBALS
+// =======================================================================
+
+InputSelection autocast_input_selection = InputSelection::OFF;
+
+// ---- Debounce configuration ----
+const uint8_t DEBOUNCE_THRESHOLD       = 5;   // consecutive agreeing samples required
+const unsigned long SAMPLE_INTERVAL_MS = 10;  // time between samples, ms
+
+static InputSelection candidateState  = InputSelection::OFF;
+static uint8_t        debounceCounter = 0;
+static unsigned long  lastSampleTime  = 0;
+
+// ---- Bluetooth (A2DP sink) globals ----
+BluetoothA2DPSink a2dp_sink;
+AutocastDisplay display;   // shared display hardware, used by any mode
+
+int bt_last_volume, bt_current_volume;
+TrackInfo currentTrack;
+
+bt_display_information_t bt_display_information = BT_NOT_CONNECTED;
+
+String bt_top_display_content;
+String bt_bottom_display_content;
+
+const uint16_t BT_OVERLAY_DURATION_MS = 1000;
+unsigned long  bt_overlay_timestamp   = 0;
+bool           bt_overlay_on          = false;
+
+// =======================================================================
+// STATE MACHINE CORE
+// =======================================================================
+
+InputSelection decodeState(int vpState, int vnState) {
+  bool vp = (vpState != LOW);
+  bool vn = (vnState != LOW);
+
+  if (vp && vn)        return InputSelection::OFF;
+  else if (!vp && vn)  return InputSelection::BLUETOOTH;
+  else if (vp && !vn)  return InputSelection::USB;
+  else                 return InputSelection::ERROR_STATE;
+}
+
+void enterState(InputSelection s) {
+  switch (s) {
+    case InputSelection::OFF:         enterOffMode();       break;
+    case InputSelection::BLUETOOTH:   enterBluetoothMode(); break;
+    case InputSelection::USB:         enterUsbMode();       break;
+    case InputSelection::ERROR_STATE: enterErrorMode();     break;
+  }
+}
+
+void exitState(InputSelection s) {
+  switch (s) {
+    case InputSelection::OFF:         exitOffMode();       break;
+    case InputSelection::BLUETOOTH:   exitBluetoothMode(); break;
+    case InputSelection::USB:         exitUsbMode();       break;
+    case InputSelection::ERROR_STATE: exitErrorMode();     break;
+  }
+}
+
+void runState(InputSelection s) {
+  switch (s) {
+    case InputSelection::OFF:         runOffMode();       break;
+    case InputSelection::BLUETOOTH:   runBluetoothMode(); break;
+    case InputSelection::USB:         runUsbMode();       break;
+    case InputSelection::ERROR_STATE: runErrorMode();     break;
+  }
+}
+
+// =======================================================================
+// OFF MODE
+// =======================================================================
+
+void enterOffMode() {
+  display.update("", "", 300);
+}
+
+void exitOffMode() { }
+
+void runOffMode() { }
+
+// =======================================================================
+// BLUETOOTH MODE
+// =======================================================================
 
 void avrc_metadata_callback(uint8_t id, const uint8_t* text) {
   String metadata = String((char*)text);
@@ -26,105 +193,186 @@ void avrc_metadata_callback(uint8_t id, const uint8_t* text) {
   }
 }
 
-enum display_information_t { NOT_CONNECTED,
-                              NOW_PLAYING,
-                              VOLUME_OVERLAY } display_information = NOT_CONNECTED;
-
 void connection_state_changed(esp_a2d_connection_state_t state, void* ptr) {
   if (state == ESP_A2D_CONNECTION_STATE_CONNECTED) {
-    display_information = NOW_PLAYING;
+    bt_display_information = BT_NOW_PLAYING;
   } else if (state == ESP_A2D_CONNECTION_STATE_DISCONNECTED) {
-    display_information = NOT_CONNECTED;
+    bt_display_information = BT_NOT_CONNECTED;
   }
 }
 
 void audio_state_changed(esp_a2d_audio_state_t state, void* ptr) {
   switch (state) {
     case ESP_A2D_AUDIO_STATE_STARTED:
-      display_information = NOW_PLAYING;
+      bt_display_information = BT_NOW_PLAYING;
       break;
     default:
       break;
   }
 }
 
-void setup() {
+void enterBluetoothMode() {
+  Serial.println("[STATE] Entering BLUETOOTH mode");
+
   i2s_pin_config_t pin_config = {
     .bck_io_num = 26,
     .ws_io_num = 25,
     .data_out_num = 22,
     .data_in_num = I2S_PIN_NO_CHANGE
   };
-
   a2dp_sink.set_pin_config(pin_config);
 
-  display.begin(5, 18, 19, 23); // no miso
-
-  Serial.begin(115200);
   a2dp_sink.set_on_connection_state_changed(connection_state_changed);
   a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
   a2dp_sink.set_on_audio_state_changed(audio_state_changed);
   a2dp_sink.start("Mazda 323");
-  last_volume = current_volume = a2dp_sink.get_volume();
+
+  bt_last_volume = bt_current_volume = a2dp_sink.get_volume();
+  bt_display_information = BT_NOT_CONNECTED;
+  bt_overlay_on = false;
+  currentTrack.title = "";
+  currentTrack.artist = "";
 }
 
-String top_display_content;
-String bottom_display_content;
+void exitBluetoothMode() {
+  // Tear down the A2DP sink so re-entering BLUETOOTH mode later starts clean.
+  a2dp_sink.end(true);
+}
 
-uint16_t overlay_duration_ms = 1000;
-unsigned long timestamp = 0;
-bool overlay_on = false;
+void runBluetoothMode() {
+  bt_current_volume = a2dp_sink.get_volume();
 
-void loop() {
-  current_volume = a2dp_sink.get_volume();
-
-  if (current_volume != last_volume) {
-    display_information = VOLUME_OVERLAY;
-    last_volume = current_volume;
-    timestamp = millis();
+  if (bt_current_volume != bt_last_volume) {
+    bt_display_information = BT_VOLUME_OVERLAY;
+    bt_last_volume = bt_current_volume;
+    bt_overlay_timestamp = millis();
   }
 
-  switch (display_information) {
-    case NOT_CONNECTED:
-      top_display_content = "   Ready to";
-      bottom_display_content = "   connect";
+  switch (bt_display_information) {
+    case BT_NOT_CONNECTED:
+      bt_top_display_content = "   Ready to";
+      bt_bottom_display_content = "   connect";
       break;
 
-    case NOW_PLAYING:
-      top_display_content = currentTrack.title;
-      bottom_display_content = currentTrack.artist;
+    case BT_NOW_PLAYING:
+      bt_top_display_content = currentTrack.title;
+      bt_bottom_display_content = currentTrack.artist;
 
-      if (top_display_content.length() < 1 && bottom_display_content.length() < 1) {
-        top_display_content = "    Device";
-        bottom_display_content = "   connected";
+      if (bt_top_display_content.length() < 1 && bt_bottom_display_content.length() < 1) {
+        bt_top_display_content = "    Device";
+        bt_bottom_display_content = "   connected";
       }
       break;
 
-    case VOLUME_OVERLAY:
-      if (overlay_on) {
-        if (millis() - timestamp > overlay_duration_ms) {
-          overlay_on = false;
-          display_information = NOW_PLAYING;
+    case BT_VOLUME_OVERLAY:
+      if (bt_overlay_on) {
+        if (millis() - bt_overlay_timestamp > BT_OVERLAY_DURATION_MS) {
+          bt_overlay_on = false;
+          bt_display_information = BT_NOW_PLAYING;
         }
       } else {
-        overlay_on = true;
-        timestamp = millis();
+        bt_overlay_on = true;
+        bt_overlay_timestamp = millis();
       }
 
-      top_display_content = "Volume";
-      bottom_display_content = "[";
+      bt_top_display_content = "Volume";
+      bt_bottom_display_content = "[";
 
-      for (int i = 0; i < current_volume; i += 11) {
-        bottom_display_content += "-";
+      for (int i = 0; i < bt_current_volume; i += 11) {
+        bt_bottom_display_content += "-";
       }
-      for (int i = bottom_display_content.length(); i < 13; i++) {
-        bottom_display_content += " ";
+      for (int i = bt_bottom_display_content.length(); i < 13; i++) {
+        bt_bottom_display_content += " ";
       }
-      bottom_display_content += "]";
+      bt_bottom_display_content += "]";
       break;
   }
 
-  display.update(top_display_content, bottom_display_content, 300);
+  display.update(bt_top_display_content, bt_bottom_display_content, 300);
 
-  delay(10);
+  delay(10); // paces display refresh / BT servicing, mirrors original loop cadence
+}
+
+// =======================================================================
+// USB MODE
+// =======================================================================
+
+void enterUsbMode() { }
+
+void exitUsbMode() { }
+
+void runUsbMode() {
+  display.update("Charging with", "1.22 A 15.01 W", 300);
+}
+
+// =======================================================================
+// ERROR MODE
+// =======================================================================
+
+void enterErrorMode() {
+  display.update("Failed to read", "selection", 300);
+}
+
+void exitErrorMode() { /* clear fault indication */ }
+
+void runErrorMode() { /* e.g. blink an error LED */ }
+
+// =======================================================================
+// SETUP / LOOP
+// =======================================================================
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(SENSOR_VP_PIN, INPUT);
+  pinMode(SENSOR_VN_PIN, INPUT);
+
+  // Display hardware is shared across modes, so it's brought up once here
+  // rather than inside any single mode's entry point.
+  display.begin(5, 18, 19, 23); // no miso
+
+  // Prime the state machine with an immediate (un-debounced) read so we
+  // start in a sensible state rather than always booting into OFF.
+  int vp = digitalRead(SENSOR_VP_PIN);
+  int vn = digitalRead(SENSOR_VN_PIN);
+  autocast_input_selection = decodeState(vp, vn);
+  candidateState = autocast_input_selection;
+  debounceCounter = DEBOUNCE_THRESHOLD;
+
+  enterState(autocast_input_selection);
+}
+
+void loop() {
+  unsigned long now = millis();
+
+  // Only sample the pins at a fixed cadence; do real work every loop.
+  if (now - lastSampleTime >= SAMPLE_INTERVAL_MS) {
+    lastSampleTime = now;
+
+    int vpState = digitalRead(SENSOR_VP_PIN);
+    int vnState = digitalRead(SENSOR_VN_PIN);
+    InputSelection sampled = decodeState(vpState, vnState);
+
+    if (sampled == candidateState) {
+      // Reading agrees with our running candidate: count it, capped at
+      // the threshold so the counter can't overflow over a long stable run.
+      if (debounceCounter < DEBOUNCE_THRESHOLD) {
+        debounceCounter++;
+      }
+    } else {
+      // Reading disagrees: start a fresh count for the new candidate.
+      candidateState  = sampled;
+      debounceCounter = 1;
+    }
+
+    // Commit the transition only once the candidate has been stable for
+    // DEBOUNCE_THRESHOLD consecutive samples.
+    if (debounceCounter >= DEBOUNCE_THRESHOLD &&
+        candidateState != autocast_input_selection) {
+      exitState(autocast_input_selection);
+      autocast_input_selection = candidateState;
+      enterState(autocast_input_selection);
+    }
+  }
+
+  runState(autocast_input_selection);
 }
