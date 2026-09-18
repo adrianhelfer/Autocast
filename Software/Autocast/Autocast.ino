@@ -1,29 +1,3 @@
-/*
- * Autocast input selection state machine
- * ----------------------------------------
- * Reads two digital sensor pins (SENSOR_VP_PIN, SENSOR_VN_PIN) and derives
- * a logical input-selection state: OFF, BLUETOOTH, USB, or ERROR_STATE.
- *
- * A counting-style debounce requires DEBOUNCE_THRESHOLD consecutive
- * samples (taken every SAMPLE_INTERVAL_MS) to agree before a state
- * transition is committed. This prevents brief electrical noise or
- * switch bounce on the pins from causing spurious mode switches.
- *
- * Each state has a defined entry point (enterXxxMode), exit point
- * (exitXxxMode), and per-loop worker (runXxxMode) — fill these in with
- * your Bluetooth / USB / power-down logic.
- *
- * NOTE ON STRUCTURE: all custom types (enums/structs) are defined right
- * after the includes, and every function has an explicit forward
- * declaration placed immediately after that. This sidesteps a classic
- * Arduino IDE issue: the IDE auto-generates its own function prototypes
- * and inserts them near the top of the translation unit, *before* any
- * custom type defined further down — which breaks with "X does not name
- * a type" for any function that takes/returns a custom enum or struct.
- * Supplying the prototypes ourselves, after the types, prevents the IDE
- * from inserting its own (broken) versions.
- */
-
 #include <Arduino.h>
 #include "BluetoothA2DPSink.h"
 #include "AutocastDisplay.h"
@@ -33,6 +7,13 @@
 // ---------------------------------------------------------------------
 const uint8_t SENSOR_VP_PIN = 36;   // adjust to your actual wiring
 const uint8_t SENSOR_VN_PIN = 39;
+
+const int CONFIG_PIN_SER   = 2;   // IO2  -> SER (serial data in)
+const int CONFIG_PIN_SRCLK = 17;  // IO17 -> SRCLK (shift register clock)
+const int CONFIG_PIN_RCLK  = 13;  // IO13 -> RCLK (storage register clock / latch)
+
+const int ILLUMINATION_SIGNAL_PIN = 4; // HIGH when headlights or parking lights are switched on
+const int DIMM_DISPLAY_PIN = 15; // Display gets darker when set to HIGH
 
 // =======================================================================
 // TYPE DEFINITIONS (must precede all forward declarations / function use)
@@ -90,6 +71,27 @@ void runUsbMode();
 void enterErrorMode();
 void exitErrorMode();
 void runErrorMode();
+
+void shiftOutByte(uint8_t data, bool msbFirst = true) {
+  for (int i = 0; i < 8; i++) {
+    // Pick the correct bit depending on shift order
+    uint8_t bit = msbFirst ? ((data >> (7 - i)) & 0x01)
+                           : ((data >> i) & 0x01);
+
+    digitalWrite(CONFIG_PIN_SER, bit);
+
+    // Pulse SRCLK to shift the bit in
+    digitalWrite(CONFIG_PIN_SRCLK, HIGH);
+    delayMicroseconds(1);   // tiny settle time, optional at low speed
+    digitalWrite(CONFIG_PIN_SRCLK, LOW);
+  }
+
+  // Latch the shifted data to the output pins
+  digitalWrite(CONFIG_PIN_RCLK, HIGH);
+  delayMicroseconds(1);
+  digitalWrite(CONFIG_PIN_RCLK, LOW);
+}
+
 
 // =======================================================================
 // GLOBALS
@@ -167,6 +169,7 @@ void runState(InputSelection s) {
 // =======================================================================
 
 void enterOffMode() {
+  shiftOutByte(0b00000000);
   display.update("", "", 300);
 }
 
@@ -212,7 +215,7 @@ void audio_state_changed(esp_a2d_audio_state_t state, void* ptr) {
 }
 
 void enterBluetoothMode() {
-  Serial.println("[STATE] Entering BLUETOOTH mode");
+  shiftOutByte(0b00001011);
 
   i2s_pin_config_t pin_config = {
     .bck_io_num = 26,
@@ -240,6 +243,10 @@ void exitBluetoothMode() {
 }
 
 void runBluetoothMode() {
+
+  // dimm display at headlight signal
+  digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
+
   bt_current_volume = a2dp_sink.get_volume();
 
   if (bt_current_volume != bt_last_volume) {
@@ -297,11 +304,14 @@ void runBluetoothMode() {
 // USB MODE
 // =======================================================================
 
-void enterUsbMode() { }
+void enterUsbMode() { 
+  shiftOutByte(0b00011111);
+}
 
 void exitUsbMode() { }
 
 void runUsbMode() {
+  digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
   display.update("Charging with", "1.22 A 15.01 W", 300);
 }
 
@@ -323,12 +333,27 @@ void runErrorMode() { /* e.g. blink an error LED */ }
 
 void setup() {
   Serial.begin(115200);
+
+  // Configuration register
+  pinMode(CONFIG_PIN_SER, OUTPUT);
+  pinMode(CONFIG_PIN_SRCLK, OUTPUT);
+  pinMode(CONFIG_PIN_RCLK, OUTPUT);
+
+  digitalWrite(CONFIG_PIN_SER, LOW);
+  digitalWrite(CONFIG_PIN_SRCLK, LOW);
+  digitalWrite(CONFIG_PIN_RCLK, LOW);
+
+  // Input selector
   pinMode(SENSOR_VP_PIN, INPUT);
   pinMode(SENSOR_VN_PIN, INPUT);
 
+  // Display dimming
+  pinMode(ILLUMINATION_SIGNAL_PIN, INPUT);
+  pinMode(DIMM_DISPLAY_PIN, OUTPUT);
+
   // Display hardware is shared across modes, so it's brought up once here
   // rather than inside any single mode's entry point.
-  display.begin(5, 18, 19, 23); // no miso
+  display.begin(5, 18, 19, 23); // no miso. pin 19 used for something else. fix later
 
   // Prime the state machine with an immediate (un-debounced) read so we
   // start in a sensible state rather than always booting into OFF.
