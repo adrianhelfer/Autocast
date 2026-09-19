@@ -3294,7 +3294,18 @@
 				)
 			)
 		)
-		(property "DigiKey" "ACPSC04-41SEKWA"
+		(property "DigiKey Part #" "754-ACPSC04-41SEKWACT-ND"
+			(at 198.12 77.47 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C6854600"
 			(at 198.12 77.47 0)
 			(hide yes)
 			(show_name no)
@@ -3720,7 +3731,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 78.74 90)
 			(hide yes)
 			(show_name no)
@@ -3919,7 +3930,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 115.57 90)
 			(hide yes)
 			(show_name no)
@@ -4118,7 +4129,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 83.82 90)
 			(hide yes)
 			(show_name no)
@@ -4317,7 +4328,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 118.11 90)
 			(hide yes)
 			(show_name no)
@@ -4702,7 +4713,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 123.19 90)
 			(hide yes)
 			(show_name no)
@@ -5087,7 +5098,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 76.2 90)
 			(hide yes)
 			(show_name no)
@@ -5288,7 +5299,18 @@
 				)
 			)
 		)
-		(property "DigiKey" "74HC595PW,118"
+		(property "DigiKey Part #" "1727-3068-1-ND"
+			(at 143.51 78.74 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C5948"
 			(at 143.51 78.74 0)
 			(hide yes)
 			(show_name no)
@@ -5529,7 +5551,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 125.73 90)
 			(hide yes)
 			(show_name no)
@@ -5915,7 +5937,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 113.03 90)
 			(hide yes)
 			(show_name no)
@@ -6114,7 +6136,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 71.12 90)
 			(hide yes)
 			(show_name no)
@@ -6500,6 +6522,28 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "1727-3068-1-ND"
+			(at 143.51 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C5948"
+			(at 143.51 123.19 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "13"
 			(uuid "8708cf51-7ca3-4b82-961d-b29102fdd8cf")
 		)
@@ -6730,7 +6774,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 81.28 90)
 			(hide yes)
 			(show_name no)
@@ -6929,7 +6973,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 120.65 90)
 			(hide yes)
 			(show_name no)
@@ -7130,7 +7174,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C49062"
+		(property "JLCPCB Part #" "C49062"
 			(at 113.03 135.89 0)
 			(hide yes)
 			(show_name no)
@@ -7329,7 +7373,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 68.58 90)
 			(hide yes)
 			(show_name no)
@@ -7530,7 +7574,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C49062"
+		(property "JLCPCB Part #" "C49062"
 			(at 97.79 135.89 0)
 			(hide yes)
 			(show_name no)
@@ -7729,7 +7773,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 73.66 90)
 			(hide yes)
 			(show_name no)
@@ -8670,7 +8714,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 128.27 90)
 			(hide yes)
 			(show_name no)
@@ -8869,7 +8913,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C25076"
+		(property "JLCPCB Part #" "C25076"
 			(at 182.88 86.36 90)
 			(hide yes)
 			(show_name no)

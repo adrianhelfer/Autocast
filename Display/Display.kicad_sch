@@ -8999,6 +8999,28 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "664-12402032E202ACT-ND"
+			(at 114.3 276.86 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C3198011"
+			(at 114.3 276.86 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "A12"
 			(uuid "323cb989-5a9f-46d9-9708-5a0ddf017e88")
 		)
@@ -9137,6 +9159,28 @@
 			)
 		)
 		(property "Description" ""
+			(at 114.3 187.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "664-12402032E202ACT-ND"
+			(at 114.3 187.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C3198011"
 			(at 114.3 187.96 0)
 			(hide yes)
 			(show_name no)
@@ -9848,6 +9892,28 @@
 			)
 		)
 		(property "Description" "\"Generic connector, single row, 01x60, script generated\""
+			(at 68.58 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "900-2004850460CT-ND"
+			(at 68.58 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB Part #" "C3168514"
 			(at 68.58 200.66 0)
 			(hide yes)
 			(show_name no)
