@@ -1975,6 +1975,12 @@
 		(path "/089b12b0-dba4-41b3-9eb6-8cab80322476/324cea92-e9b3-4ce8-ba46-2ae6675afca0")
 		(sheetname "/Amplifier Input Mux/")
 		(sheetfile "Amplifier_Input_Mux.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1" "2" "3" "4" "8" "7" "6" "5")
+			)
+		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -39345,7 +39351,7 @@
 				)
 			)
 		)
-		(property "JLCPCB Part #" ""
+		(property "JLCPCB Part #" "C3168514"
 			(at 0 0 0)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -67345,7 +67351,7 @@
 			(extension_offset 0.5)
 			(keep_text_aligned yes)
 		)
-		(gr_text "3,5"
+		(gr_text "3.5"
 			(at 31.85 153.25 90)
 			(layer "F.Fab")
 			(uuid "0f32e93a-dd6d-4923-8b92-18ff3bcce59a")
@@ -67383,7 +67389,7 @@
 			(extension_offset 0.5)
 			(keep_text_aligned yes)
 		)
-		(gr_text "8,5"
+		(gr_text "8.5"
 			(at 28.85 155.75 90)
 			(layer "F.Fab")
 			(uuid "8170aab7-aa68-48c4-9014-781ef95f1424")
