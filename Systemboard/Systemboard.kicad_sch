@@ -11776,7 +11776,7 @@
 				)
 			)
 		)
-		(property "JLCPCB Part #" ""
+		(property "JLCPCB Part #" "C3168514"
 			(at 31.75 102.87 0)
 			(hide yes)
 			(show_name no)
