@@ -3742,6 +3742,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 78.74 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "9e2c0593-3c3a-412c-ae26-7ff4ee59dec8")
 		)
@@ -3931,6 +3942,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 115.57 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 115.57 90)
 			(hide yes)
 			(show_name no)
@@ -4140,6 +4162,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 83.82 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "242761a3-c0a0-41e1-94e3-3336ca79561c")
 		)
@@ -4329,6 +4362,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 118.11 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 118.11 90)
 			(hide yes)
 			(show_name no)
@@ -4724,6 +4768,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 123.19 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "4a6d8e09-f52b-46d4-97b9-00d9c12e3a4f")
 		)
@@ -5099,6 +5154,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 76.2 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 76.2 90)
 			(hide yes)
 			(show_name no)
@@ -5562,6 +5628,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 125.73 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "dc9ffed7-f02c-48b5-a284-a995fc97d393")
 		)
@@ -5948,6 +6025,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 113.03 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "367cde4c-d5f0-4f0d-8813-b685180b0ef8")
 		)
@@ -6137,6 +6225,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 71.12 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 71.12 90)
 			(hide yes)
 			(show_name no)
@@ -6785,6 +6884,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 81.28 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "d65397e6-fdda-4835-9571-0d87d8e7aedb")
 		)
@@ -6974,6 +7084,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 120.65 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 120.65 90)
 			(hide yes)
 			(show_name no)
@@ -7185,6 +7306,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "1276-1115-1-ND"
+			(at 113.03 135.89 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "b9260eaa-6b80-46da-a2a4-73a61e8263fc")
 		)
@@ -7374,6 +7506,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 68.58 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 68.58 90)
 			(hide yes)
 			(show_name no)
@@ -7585,6 +7728,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "1276-1115-1-ND"
+			(at 97.79 135.89 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "a6fc919f-63e7-4f54-8bc0-9e03a3e40a25")
 		)
@@ -7774,6 +7928,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 73.66 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 73.66 90)
 			(hide yes)
 			(show_name no)
@@ -8725,6 +8890,17 @@
 				)
 			)
 		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
+			(at 182.88 128.27 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "f2e1debb-3754-4bd4-afa7-83d8aac96b5a")
 		)
@@ -8914,6 +9090,17 @@
 			)
 		)
 		(property "JLCPCB Part #" "C25076"
+			(at 182.88 86.36 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey Part #" "311-100LRCT-ND"
 			(at 182.88 86.36 90)
 			(hide yes)
 			(show_name no)
