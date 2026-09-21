@@ -1,7 +1,26 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include "BluetoothA2DPSink.h"
 #include "AutocastDisplay.h"
 
+// USB current monitor
+#define USB_POWER_MONITOR_SDA_PIN 32
+#define USB_POWER_MONITOR_SCL_PIN 33
+#define INA226_ADDR 0x40          // Default address (A0=A1=GND)
+#define SHUNT_RESISTOR_OHMS 0.01  // 0.01 ohm shunt
+#define MAX_EXPECTED_USB_CURRENT_A 3.2
+
+// ---------- INA226 register map ----------
+#define INA226_REG_CONFIG      0x00
+#define INA226_REG_SHUNT_V     0x01
+#define INA226_REG_BUS_V       0x02
+#define INA226_REG_POWER       0x03
+#define INA226_REG_CURRENT     0x04
+#define INA226_REG_CALIBRATION 0x05
+
+float INA226_currentLSB;   // Amps per bit for the current register
+float INA226_powerLSB;     // Watts per bit for the power register
+int success = 0;
 // ---------------------------------------------------------------------
 // Pin definitions
 // ---------------------------------------------------------------------
@@ -90,6 +109,46 @@ void shiftOutByte(uint8_t data, bool msbFirst = true) {
   digitalWrite(CONFIG_PIN_RCLK, HIGH);
   delayMicroseconds(1);
   digitalWrite(CONFIG_PIN_RCLK, LOW);
+}
+
+void ina226Write16(uint8_t reg, uint16_t value) {
+  Wire.beginTransmission(INA226_ADDR);
+  Wire.write(reg);
+  Wire.write((value >> 8) & 0xFF);  // MSB first
+  Wire.write(value & 0xFF);
+  Wire.endTransmission();
+}
+
+int16_t ina226Read16(uint8_t reg) {
+  Wire.beginTransmission(INA226_ADDR);
+  Wire.write(reg);
+  Wire.endTransmission(false);
+  Wire.requestFrom(INA226_ADDR, (uint8_t)2);
+  uint16_t value = 0;
+  if (Wire.available() >= 2) {
+    value = (Wire.read() << 8) | Wire.read();
+  }
+  return (int16_t)value;
+}
+
+void setupINA226() {
+  // Current_LSB = MaxExpectedCurrent / 2^15
+  INA226_currentLSB = MAX_EXPECTED_USB_CURRENT_A / 32768.0;
+  INA226_powerLSB = INA226_currentLSB * 25.0;  // Power_LSB = 25 * Current_LSB (per datasheet)
+
+  // Calibration = 0.00512 / (Current_LSB * Rshunt)
+  uint16_t calValue = (uint16_t)(0.00512 / (INA226_currentLSB * SHUNT_RESISTOR_OHMS));
+  ina226Write16(INA226_REG_CALIBRATION, calValue);
+
+  // Config register: default reset value 0x4127 gives
+  // avg=1, bus/shunt conv time=1.1ms, continuous shunt+bus mode.
+  // Increase averaging for smoother readings, e.g. 0x4527 (avg=16).
+  ina226Write16(INA226_REG_CONFIG, 0x4527);
+
+  Serial.print("Calibration register set to: ");
+  Serial.println(calValue);
+  Serial.print("Current LSB (A/bit): ");
+  Serial.println(INA226_currentLSB, 8);
 }
 
 
@@ -312,7 +371,33 @@ void exitUsbMode() { }
 
 void runUsbMode() {
   digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
-  display.update("Charging with", "1.22 A 15.01 W", 300);
+
+
+  delay(100);
+  Wire.beginTransmission(INA226_ADDR);
+  delay(100);
+  if (Wire.endTransmission() != 0) {
+    success = 0;
+  } else {
+    success = 1;
+  }
+
+  setupINA226();
+
+  int16_t rawShunt = ina226Read16(INA226_REG_SHUNT_V);
+  int16_t rawBus   = ina226Read16(INA226_REG_BUS_V);
+  int16_t rawCurr  = ina226Read16(INA226_REG_CURRENT);
+  int16_t rawPower = ina226Read16(INA226_REG_POWER);
+
+  float shuntVoltage_mV = rawShunt * 0.0025f;      // LSB = 2.5uV
+  float busVoltage_V    = rawBus   * 0.00125f;     // LSB = 1.25mV
+  float current_mA      = rawCurr  * INA226_currentLSB * 1000.0f;
+  float power_mW        = rawPower * INA226_powerLSB   * 1000.0f;
+  
+  char charging_string[32];
+  sprintf(charging_string, "%.2f A %.2f W", current_mA / 1000, power_mW / 1000);
+  display.update(success ? "Charging with" : "Error", charging_string, 300);
+
 }
 
 // =======================================================================
@@ -362,6 +447,21 @@ void setup() {
   autocast_input_selection = decodeState(vp, vn);
   candidateState = autocast_input_selection;
   debounceCounter = DEBOUNCE_THRESHOLD;
+
+  Wire.begin(USB_POWER_MONITOR_SDA_PIN, USB_POWER_MONITOR_SCL_PIN);
+  Wire.setClock(50000);  // 50kHz, because the wiring is a bit loose 
+
+  // Check device is present
+  delay(100);
+  Wire.beginTransmission(INA226_ADDR);
+  delay(100);
+  if (Wire.endTransmission() != 0) {
+    success = 0;
+  } else {
+    success = 1;
+  }
+
+  setupINA226();
 
   enterState(autocast_input_selection);
 }
