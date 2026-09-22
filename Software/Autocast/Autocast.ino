@@ -34,6 +34,7 @@ const int CONFIG_PIN_RCLK  = 13;  // IO13 -> RCLK (storage register clock / latc
 const int ILLUMINATION_SIGNAL_PIN = 4; // HIGH when headlights or parking lights are switched on
 const int DIMM_DISPLAY_PIN = 15; // Display gets darker when set to HIGH
 
+const int USB_DAC_CABLE_DETECT_A = 19;
 const int USB_DAC_CABLE_DETECT_B = 21;
 
 // =======================================================================
@@ -399,10 +400,12 @@ void runUsbMode() {
   digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
   
   static int dac_enabled = 0;
-  if (digitalRead(USB_DAC_CABLE_DETECT_B) && !dac_enabled) {
+  int cable_present = digitalRead(USB_DAC_CABLE_DETECT_A) || digitalRead(USB_DAC_CABLE_DETECT_B);
+
+  if (cable_present && !dac_enabled) {
     enable_usb_dac();
     dac_enabled = 1;
-  } else if (!digitalRead(USB_DAC_CABLE_DETECT_B) && dac_enabled) {
+  } else if (!cable_present && dac_enabled) {
     disable_usb_dac();
     dac_enabled = 0;
   }
@@ -471,11 +474,12 @@ void setup() {
   pinMode(DIMM_DISPLAY_PIN, OUTPUT);
 
   // USB cable detect
+  pinMode(USB_DAC_CABLE_DETECT_A, INPUT);
   pinMode(USB_DAC_CABLE_DETECT_B, INPUT);
 
   // Display hardware is shared across modes, so it's brought up once here
   // rather than inside any single mode's entry point.
-  display.begin(5, 18, 19, 23); // no miso. pin 19 used for something else. fix later
+  display.begin(5, 18, -1, 23); // no miso. pin 19 used for something else. fix later
 
   // Prime the state machine with an immediate (un-debounced) read so we
   // start in a sensible state rather than always booting into OFF.
