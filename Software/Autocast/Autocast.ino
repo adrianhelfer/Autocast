@@ -313,7 +313,7 @@ void enterBluetoothMode() {
   a2dp_sink.set_on_connection_state_changed(connection_state_changed);
   a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
   a2dp_sink.set_on_audio_state_changed(audio_state_changed);
-  a2dp_sink.start("Mazda 323");
+  a2dp_sink.start("Mazda 323", true);
 
   bt_last_volume = bt_current_volume = a2dp_sink.get_volume();
   bt_display_information = BT_NOT_CONNECTED;
