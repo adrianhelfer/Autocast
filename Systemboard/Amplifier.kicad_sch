@@ -8023,7 +8023,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100k"
+		(property "Value" "47k"
 			(at 166.37 102.8699 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8067,7 +8067,7 @@
 				)
 			)
 		)
-		(property "DigiKey Part #" "P100KDBCT-ND"
+		(property "DigiKey Part #" "311-47.0KHRCT-ND"
 			(at 163.83 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -8078,7 +8078,7 @@
 				)
 			)
 		)
-		(property "JLCPCB Part #" "C25803"
+		(property "JLCPCB Part #" "C25819"
 			(at 163.83 101.6 0)
 			(hide yes)
 			(show_name no)
