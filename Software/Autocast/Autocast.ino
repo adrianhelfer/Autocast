@@ -34,6 +34,8 @@ const int CONFIG_PIN_RCLK  = 13;  // IO13 -> RCLK (storage register clock / latc
 const int ILLUMINATION_SIGNAL_PIN = 4; // HIGH when headlights or parking lights are switched on
 const int DIMM_DISPLAY_PIN = 15; // Display gets darker when set to HIGH
 
+const int USB_DAC_CABLE_DETECT_B = 21;
+
 // =======================================================================
 // TYPE DEFINITIONS (must precede all forward declarations / function use)
 // =======================================================================
@@ -45,6 +47,14 @@ enum class InputSelection : uint8_t {
   USB,
   ERROR_STATE
 };
+
+// ---- Bits to shift into the configuration register ----
+enum config_t {
+  OFF_CONFIG         = 0b00000000,
+  BLUETOOTH_CONFIG   = 0b00001011,
+  USB_CONFIG         = 0b00001111, // USB DAC not on by default
+  USB_DAC_EN_BITMASK = 0b00010000
+} current_config;
 
 // ---- Bluetooth-mode-local display state ----
 enum bt_display_information_t {
@@ -109,6 +119,21 @@ void shiftOutByte(uint8_t data, bool msbFirst = true) {
   digitalWrite(CONFIG_PIN_RCLK, HIGH);
   delayMicroseconds(1);
   digitalWrite(CONFIG_PIN_RCLK, LOW);
+}
+
+
+void load_config(config_t config) {
+  current_config = config;
+  shiftOutByte(config);
+}
+
+void enable_usb_dac() {
+  load_config((config_t)(current_config | USB_DAC_EN_BITMASK));
+}
+
+
+void disable_usb_dac() {
+  load_config((config_t)(current_config & ~USB_DAC_EN_BITMASK));
 }
 
 void ina226Write16(uint8_t reg, uint16_t value) {
@@ -228,7 +253,7 @@ void runState(InputSelection s) {
 // =======================================================================
 
 void enterOffMode() {
-  shiftOutByte(0b00000000);
+  load_config(OFF_CONFIG);
   display.update("", "", 300);
 }
 
@@ -274,7 +299,7 @@ void audio_state_changed(esp_a2d_audio_state_t state, void* ptr) {
 }
 
 void enterBluetoothMode() {
-  shiftOutByte(0b00001011);
+  load_config(BLUETOOTH_CONFIG);
 
   i2s_pin_config_t pin_config = {
     .bck_io_num = 26,
@@ -298,7 +323,8 @@ void enterBluetoothMode() {
 
 void exitBluetoothMode() {
   // Tear down the A2DP sink so re-entering BLUETOOTH mode later starts clean.
-  a2dp_sink.end(true);
+  a2dp_sink.end(false);
+  delay(200); // try at enterBluetooth or at runBluetooth if better performance has been proven that way
 }
 
 void runBluetoothMode() {
@@ -364,14 +390,22 @@ void runBluetoothMode() {
 // =======================================================================
 
 void enterUsbMode() { 
-  shiftOutByte(0b00011111);
+  load_config(USB_CONFIG);
 }
 
 void exitUsbMode() { }
 
 void runUsbMode() {
   digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
-
+  
+  static int dac_enabled = 0;
+  if (digitalRead(USB_DAC_CABLE_DETECT_B) && !dac_enabled) {
+    enable_usb_dac();
+    dac_enabled = 1;
+  } else if (!digitalRead(USB_DAC_CABLE_DETECT_B) && dac_enabled) {
+    disable_usb_dac();
+    dac_enabled = 0;
+  }
 
   delay(100);
   Wire.beginTransmission(INA226_ADDR);
@@ -435,6 +469,9 @@ void setup() {
   // Display dimming
   pinMode(ILLUMINATION_SIGNAL_PIN, INPUT);
   pinMode(DIMM_DISPLAY_PIN, OUTPUT);
+
+  // USB cable detect
+  pinMode(USB_DAC_CABLE_DETECT_B, INPUT);
 
   // Display hardware is shared across modes, so it's brought up once here
   // rather than inside any single mode's entry point.
