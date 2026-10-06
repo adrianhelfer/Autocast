@@ -37,6 +37,16 @@ const int DIMM_DISPLAY_PIN = 15; // Display gets darker when set to HIGH
 const int USB_DAC_CABLE_DETECT_A = 19;
 const int USB_DAC_CABLE_DETECT_B = 21;
 
+// Button order matches schematic but not the physical layout due to routing optimization
+const int USER_BUTTON_1 = 12;
+const int USER_BUTTON_2 = 14;
+const int USER_BUTTON_3 = 27;
+const int USER_BUTTON_4 = 34;
+const int USER_BUTTON_5 = 35;
+
+// Amplifier failure
+const int AMP_FAIL_PIN = 16;
+
 // =======================================================================
 // TYPE DEFINITIONS (must precede all forward declarations / function use)
 // =======================================================================
@@ -456,6 +466,14 @@ void runErrorMode() { /* e.g. blink an error LED */ }
 void setup() {
   Serial.begin(115200);
 
+  // Buttons
+  pinMode(USER_BUTTON_1, INPUT);
+  pinMode(USER_BUTTON_2, INPUT);
+  pinMode(USER_BUTTON_3, INPUT);
+  pinMode(USER_BUTTON_4, INPUT);
+  pinMode(USER_BUTTON_5, INPUT);
+  
+
   // Configuration register
   pinMode(CONFIG_PIN_SER, OUTPUT);
   pinMode(CONFIG_PIN_SRCLK, OUTPUT);
@@ -476,6 +494,9 @@ void setup() {
   // USB cable detect
   pinMode(USB_DAC_CABLE_DETECT_A, INPUT);
   pinMode(USB_DAC_CABLE_DETECT_B, INPUT);
+
+  // Amplifier failure
+  pinMode(AMP_FAIL_PIN, INPUT);
 
   // Display hardware is shared across modes, so it's brought up once here
   // rather than inside any single mode's entry point.
