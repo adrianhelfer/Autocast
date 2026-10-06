@@ -11,28 +11,28 @@
 #define MAX_EXPECTED_USB_CURRENT_A 3.2
 
 // ---------- INA226 register map ----------
-#define INA226_REG_CONFIG      0x00
-#define INA226_REG_SHUNT_V     0x01
-#define INA226_REG_BUS_V       0x02
-#define INA226_REG_POWER       0x03
-#define INA226_REG_CURRENT     0x04
+#define INA226_REG_CONFIG 0x00
+#define INA226_REG_SHUNT_V 0x01
+#define INA226_REG_BUS_V 0x02
+#define INA226_REG_POWER 0x03
+#define INA226_REG_CURRENT 0x04
 #define INA226_REG_CALIBRATION 0x05
 
-float INA226_currentLSB;   // Amps per bit for the current register
-float INA226_powerLSB;     // Watts per bit for the power register
+float INA226_currentLSB;  // Amps per bit for the current register
+float INA226_powerLSB;    // Watts per bit for the power register
 int success = 0;
 // ---------------------------------------------------------------------
 // Pin definitions
 // ---------------------------------------------------------------------
-const uint8_t SENSOR_VP_PIN = 36;   // adjust to your actual wiring
+const uint8_t SENSOR_VP_PIN = 36;  // adjust to your actual wiring
 const uint8_t SENSOR_VN_PIN = 39;
 
-const int CONFIG_PIN_SER   = 2;   // IO2  -> SER (serial data in)
+const int CONFIG_PIN_SER = 2;     // IO2  -> SER (serial data in)
 const int CONFIG_PIN_SRCLK = 17;  // IO17 -> SRCLK (shift register clock)
-const int CONFIG_PIN_RCLK  = 13;  // IO13 -> RCLK (storage register clock / latch)
+const int CONFIG_PIN_RCLK = 13;   // IO13 -> RCLK (storage register clock / latch)
 
-const int ILLUMINATION_SIGNAL_PIN = 4; // HIGH when headlights or parking lights are switched on
-const int DIMM_DISPLAY_PIN = 15; // Display gets darker when set to HIGH
+const int ILLUMINATION_SIGNAL_PIN = 4;  // HIGH when headlights or parking lights are switched on
+const int DIMM_DISPLAY_PIN = 15;        // Display gets darker when set to HIGH
 
 const int USB_DAC_CABLE_DETECT_A = 19;
 const int USB_DAC_CABLE_DETECT_B = 21;
@@ -48,25 +48,25 @@ const int USER_BUTTON_5 = 35;
 // Set to LOW if your buttons pull the line to GND when pressed.
 #define BUTTON_ACTIVE_LEVEL HIGH
 
-const uint8_t BT_BTN_PREV      = USER_BUTTON_1;
+const uint8_t BT_BTN_PREV = USER_BUTTON_1;
 const uint8_t BT_BTN_PLAYPAUSE = USER_BUTTON_2;
-const uint8_t BT_BTN_NEXT      = USER_BUTTON_5;
-const uint8_t BT_BTN_VOL_DOWN  = USER_BUTTON_4;
-const uint8_t BT_BTN_VOL_UP    = USER_BUTTON_3;
+const uint8_t BT_BTN_NEXT = USER_BUTTON_5;
+const uint8_t BT_BTN_VOL_DOWN = USER_BUTTON_4;
+const uint8_t BT_BTN_VOL_UP = USER_BUTTON_3;
 
-const uint8_t       BT_VOLUME_STEP         = 10;
-const unsigned long BT_REPEAT_DELAY_MS     = 400;  // hold time before repeating
-const unsigned long BT_REPEAT_INTERVAL_MS  = 150;  // repeat rate while held
+const uint8_t BT_VOLUME_STEP = 10;
+const unsigned long BT_REPEAT_DELAY_MS = 400;     // hold time before repeating
+const unsigned long BT_REPEAT_INTERVAL_MS = 150;  // repeat rate while held
 
 bool bt_is_connected = false;
-bool bt_is_playing   = false;
+bool bt_is_playing = false;
 
 static const uint8_t BT_BUTTON_PINS[5] = {
   USER_BUTTON_1, USER_BUTTON_2, USER_BUTTON_3, USER_BUTTON_4, USER_BUTTON_5
 };
-static bool          btn_last[5]       = {false, false, false, false, false};
-static unsigned long btn_press_time[5] = {0, 0, 0, 0, 0};
-static unsigned long btn_last_repeat[5] = {0, 0, 0, 0, 0};
+static bool btn_last[5] = { false, false, false, false, false };
+static unsigned long btn_press_time[5] = { 0, 0, 0, 0, 0 };
+static unsigned long btn_last_repeat[5] = { 0, 0, 0, 0, 0 };
 
 // Amplifier failure
 const int AMP_FAIL_PIN = 16;
@@ -85,9 +85,9 @@ enum class InputSelection : uint8_t {
 
 // ---- Bits to shift into the configuration register ----
 enum config_t {
-  OFF_CONFIG         = 0b00000000,
-  BLUETOOTH_CONFIG   = 0b00001011,
-  USB_CONFIG         = 0b00001111, // USB DAC not on by default
+  OFF_CONFIG = 0b00000000,
+  BLUETOOTH_CONFIG = 0b00001011,
+  USB_CONFIG = 0b00001111,  // USB DAC not on by default
   USB_DAC_EN_BITMASK = 0b00010000
 } current_config;
 
@@ -146,7 +146,7 @@ void shiftOutByte(uint8_t data, bool msbFirst = true) {
 
     // Pulse SRCLK to shift the bit in
     digitalWrite(CONFIG_PIN_SRCLK, HIGH);
-    delayMicroseconds(1);   // tiny settle time, optional at low speed
+    delayMicroseconds(1);  // tiny settle time, optional at low speed
     digitalWrite(CONFIG_PIN_SRCLK, LOW);
   }
 
@@ -219,16 +219,16 @@ void setupINA226() {
 InputSelection autocast_input_selection = InputSelection::OFF;
 
 // ---- Debounce configuration ----
-const uint8_t DEBOUNCE_THRESHOLD       = 5;   // consecutive agreeing samples required
+const uint8_t DEBOUNCE_THRESHOLD = 5;         // consecutive agreeing samples required
 const unsigned long SAMPLE_INTERVAL_MS = 10;  // time between samples, ms
 
-static InputSelection candidateState  = InputSelection::OFF;
-static uint8_t        debounceCounter = 0;
-static unsigned long  lastSampleTime  = 0;
+static InputSelection candidateState = InputSelection::OFF;
+static uint8_t debounceCounter = 0;
+static unsigned long lastSampleTime = 0;
 
 // ---- Bluetooth (A2DP sink) globals ----
 BluetoothA2DPSink a2dp_sink;
-AutocastDisplay display;   // shared display hardware, used by any mode
+AutocastDisplay display;  // shared display hardware, used by any mode
 
 int bt_last_volume, bt_current_volume;
 TrackInfo currentTrack;
@@ -239,8 +239,8 @@ String bt_top_display_content;
 String bt_bottom_display_content;
 
 const uint16_t BT_OVERLAY_DURATION_MS = 1000;
-unsigned long  bt_overlay_timestamp   = 0;
-bool           bt_overlay_on          = false;
+unsigned long bt_overlay_timestamp = 0;
+bool bt_overlay_on = false;
 
 // =======================================================================
 // STATE MACHINE CORE
@@ -250,36 +250,36 @@ InputSelection decodeState(int vpState, int vnState) {
   bool vp = (vpState != LOW);
   bool vn = (vnState != LOW);
 
-  if (vp && vn)        return InputSelection::OFF;
-  else if (!vp && vn)  return InputSelection::BLUETOOTH;
-  else if (vp && !vn)  return InputSelection::USB;
-  else                 return InputSelection::ERROR_STATE;
+  if (vp && vn) return InputSelection::OFF;
+  else if (!vp && vn) return InputSelection::BLUETOOTH;
+  else if (vp && !vn) return InputSelection::USB;
+  else return InputSelection::ERROR_STATE;
 }
 
 void enterState(InputSelection s) {
   switch (s) {
-    case InputSelection::OFF:         enterOffMode();       break;
-    case InputSelection::BLUETOOTH:   enterBluetoothMode(); break;
-    case InputSelection::USB:         enterUsbMode();       break;
-    case InputSelection::ERROR_STATE: enterErrorMode();     break;
+    case InputSelection::OFF: enterOffMode(); break;
+    case InputSelection::BLUETOOTH: enterBluetoothMode(); break;
+    case InputSelection::USB: enterUsbMode(); break;
+    case InputSelection::ERROR_STATE: enterErrorMode(); break;
   }
 }
 
 void exitState(InputSelection s) {
   switch (s) {
-    case InputSelection::OFF:         exitOffMode();       break;
-    case InputSelection::BLUETOOTH:   exitBluetoothMode(); break;
-    case InputSelection::USB:         exitUsbMode();       break;
-    case InputSelection::ERROR_STATE: exitErrorMode();     break;
+    case InputSelection::OFF: exitOffMode(); break;
+    case InputSelection::BLUETOOTH: exitBluetoothMode(); break;
+    case InputSelection::USB: exitUsbMode(); break;
+    case InputSelection::ERROR_STATE: exitErrorMode(); break;
   }
 }
 
 void runState(InputSelection s) {
   switch (s) {
-    case InputSelection::OFF:         runOffMode();       break;
-    case InputSelection::BLUETOOTH:   runBluetoothMode(); break;
-    case InputSelection::USB:         runUsbMode();       break;
-    case InputSelection::ERROR_STATE: runErrorMode();     break;
+    case InputSelection::OFF: runOffMode(); break;
+    case InputSelection::BLUETOOTH: runBluetoothMode(); break;
+    case InputSelection::USB: runUsbMode(); break;
+    case InputSelection::ERROR_STATE: runErrorMode(); break;
   }
 }
 
@@ -292,9 +292,9 @@ void enterOffMode() {
   display.update("", "", 300);
 }
 
-void exitOffMode() { }
+void exitOffMode() {}
 
-void runOffMode() { }
+void runOffMode() {}
 
 // =======================================================================
 // BLUETOOTH MODE
@@ -341,7 +341,7 @@ void audio_state_changed(esp_a2d_audio_state_t state, void* ptr) {
 void enterBluetoothMode() {
   load_config(BLUETOOTH_CONFIG);
   bt_is_connected = false;
-  bt_is_playing   = false;
+  bt_is_playing = false;
   syncButtonStates();
 
   i2s_pin_config_t pin_config = {
@@ -367,7 +367,7 @@ void enterBluetoothMode() {
 void exitBluetoothMode() {
   // Tear down the A2DP sink so re-entering BLUETOOTH mode later starts clean.
   a2dp_sink.end(false);
-  delay(200); // try at enterBluetooth or at runBluetooth if better performance has been proven that way
+  delay(200);  // try at enterBluetooth or at runBluetooth if better performance has been proven that way
 }
 
 static void changeVolume(int delta) {
@@ -376,13 +376,13 @@ static void changeVolume(int delta) {
 }
 
 static void handleButtonAction(uint8_t pin) {
-  if      (pin == BT_BTN_PREV)      a2dp_sink.previous();
-  else if (pin == BT_BTN_NEXT)      a2dp_sink.next();
-  else if (pin == BT_BTN_VOL_UP)    changeVolume(+BT_VOLUME_STEP);
-  else if (pin == BT_BTN_VOL_DOWN)  changeVolume(-BT_VOLUME_STEP);
+  if (pin == BT_BTN_PREV) a2dp_sink.previous();
+  else if (pin == BT_BTN_NEXT) a2dp_sink.next();
+  else if (pin == BT_BTN_VOL_UP) changeVolume(+BT_VOLUME_STEP);
+  else if (pin == BT_BTN_VOL_DOWN) changeVolume(-BT_VOLUME_STEP);
   else if (pin == BT_BTN_PLAYPAUSE) {
     if (bt_is_playing) a2dp_sink.pause();
-    else               a2dp_sink.play();
+    else a2dp_sink.play();
   }
 }
 
@@ -402,14 +402,10 @@ static void handleBluetoothButtons() {
 
     if (pressed && !btn_last[i]) {
       // Rising edge: a fresh press
-      btn_press_time[i]  = now;
+      btn_press_time[i] = now;
       btn_last_repeat[i] = now;
-      if (bt_is_connected) handleButtonAction(pin);   // same guard as the old isConnected check
-    }
-    else if (pressed && btn_last[i] &&
-             (pin == BT_BTN_VOL_UP || pin == BT_BTN_VOL_DOWN) &&
-             now - btn_press_time[i]  > BT_REPEAT_DELAY_MS &&
-             now - btn_last_repeat[i] > BT_REPEAT_INTERVAL_MS) {
+      if (bt_is_connected) handleButtonAction(pin);  // same guard as the old isConnected check
+    } else if (pressed && btn_last[i] && (pin == BT_BTN_VOL_UP || pin == BT_BTN_VOL_DOWN) && now - btn_press_time[i] > BT_REPEAT_DELAY_MS && now - btn_last_repeat[i] > BT_REPEAT_INTERVAL_MS) {
       // Held volume button: auto-repeat
       btn_last_repeat[i] = now;
       if (bt_is_connected) handleButtonAction(pin);
@@ -474,22 +470,22 @@ void runBluetoothMode() {
 
   display.update(bt_top_display_content, bt_bottom_display_content, 300);
 
-  delay(10); // paces display refresh / BT servicing, mirrors original loop cadence
+  delay(10);  // paces display refresh / BT servicing, mirrors original loop cadence
 }
 
 // =======================================================================
 // USB MODE
 // =======================================================================
 
-void enterUsbMode() { 
+void enterUsbMode() {
   load_config(USB_CONFIG);
 }
 
-void exitUsbMode() { }
+void exitUsbMode() {}
 
 void runUsbMode() {
   digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
-  
+
   static int dac_enabled = 0;
   int cable_present = digitalRead(USB_DAC_CABLE_DETECT_A) || digitalRead(USB_DAC_CABLE_DETECT_B);
 
@@ -513,19 +509,18 @@ void runUsbMode() {
   setupINA226();
 
   int16_t rawShunt = ina226Read16(INA226_REG_SHUNT_V);
-  int16_t rawBus   = ina226Read16(INA226_REG_BUS_V);
-  int16_t rawCurr  = ina226Read16(INA226_REG_CURRENT);
+  int16_t rawBus = ina226Read16(INA226_REG_BUS_V);
+  int16_t rawCurr = ina226Read16(INA226_REG_CURRENT);
   int16_t rawPower = ina226Read16(INA226_REG_POWER);
 
-  float shuntVoltage_mV = rawShunt * 0.0025f;      // LSB = 2.5uV
-  float busVoltage_V    = rawBus   * 0.00125f;     // LSB = 1.25mV
-  float current_mA      = rawCurr  * INA226_currentLSB * 1000.0f;
-  float power_mW        = rawPower * INA226_powerLSB   * 1000.0f;
-  
+  float shuntVoltage_mV = rawShunt * 0.0025f;  // LSB = 2.5uV
+  float busVoltage_V = rawBus * 0.00125f;      // LSB = 1.25mV
+  float current_mA = rawCurr * INA226_currentLSB * 1000.0f;
+  float power_mW = rawPower * INA226_powerLSB * 1000.0f;
+
   char charging_string[32];
   sprintf(charging_string, "%.2f A %.2f W", current_mA / 1000, power_mW / 1000);
   display.update(success ? "Charging with" : "Error", charging_string, 300);
-
 }
 
 // =======================================================================
@@ -536,9 +531,11 @@ void enterErrorMode() {
   display.update("Failed to read", "selection", 300);
 }
 
-void exitErrorMode() { /* clear fault indication */ }
+void exitErrorMode() { /* clear fault indication */
+}
 
-void runErrorMode() { /* e.g. blink an error LED */ }
+void runErrorMode() { /* e.g. blink an error LED */
+}
 
 // =======================================================================
 // SETUP / LOOP
@@ -553,7 +550,7 @@ void setup() {
   pinMode(USER_BUTTON_3, INPUT);
   pinMode(USER_BUTTON_4, INPUT);
   pinMode(USER_BUTTON_5, INPUT);
-  
+
 
   // Configuration register
   pinMode(CONFIG_PIN_SER, OUTPUT);
@@ -581,7 +578,7 @@ void setup() {
 
   // Display hardware is shared across modes, so it's brought up once here
   // rather than inside any single mode's entry point.
-  display.begin(5, 18, -1, 23); // no miso. pin 19 used for something else. fix later
+  display.begin(5, 18, -1, 23);  // no miso. pin 19 used for something else. fix later
 
   // Prime the state machine with an immediate (un-debounced) read so we
   // start in a sensible state rather than always booting into OFF.
@@ -592,7 +589,7 @@ void setup() {
   debounceCounter = DEBOUNCE_THRESHOLD;
 
   Wire.begin(USB_POWER_MONITOR_SDA_PIN, USB_POWER_MONITOR_SCL_PIN);
-  Wire.setClock(50000);  // 50kHz, because the wiring is a bit loose 
+  Wire.setClock(50000);  // 50kHz, because the wiring is a bit loose
 
   // Check device is present
   delay(100);
@@ -628,14 +625,13 @@ void loop() {
       }
     } else {
       // Reading disagrees: start a fresh count for the new candidate.
-      candidateState  = sampled;
+      candidateState = sampled;
       debounceCounter = 1;
     }
 
     // Commit the transition only once the candidate has been stable for
     // DEBOUNCE_THRESHOLD consecutive samples.
-    if (debounceCounter >= DEBOUNCE_THRESHOLD &&
-        candidateState != autocast_input_selection) {
+    if (debounceCounter >= DEBOUNCE_THRESHOLD && candidateState != autocast_input_selection) {
       exitState(autocast_input_selection);
       autocast_input_selection = candidateState;
       enterState(autocast_input_selection);
