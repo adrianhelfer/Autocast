@@ -204,11 +204,7 @@ void setupINA226() {
   // avg=1, bus/shunt conv time=1.1ms, continuous shunt+bus mode.
   // Increase averaging for smoother readings, e.g. 0x4527 (avg=16).
   ina226Write16(INA226_REG_CONFIG, 0x4527);
-
-  Serial.print("Calibration register set to: ");
-  Serial.println(calValue);
-  Serial.print("Current LSB (A/bit): ");
-  Serial.println(INA226_currentLSB, 8);
+  delay(100);
 }
 
 
@@ -300,6 +296,10 @@ void runOffMode() {}
 // BLUETOOTH MODE
 // =======================================================================
 
+void avrc_rn_playstatus_callback(esp_avrc_playback_stat_t playback) {
+  bt_is_playing = (playback == ESP_AVRC_PLAYBACK_PLAYING);
+}
+
 void avrc_metadata_callback(uint8_t id, const uint8_t* text) {
   String metadata = String((char*)text);
 
@@ -355,6 +355,7 @@ void enterBluetoothMode() {
   a2dp_sink.set_on_connection_state_changed(connection_state_changed);
   a2dp_sink.set_avrc_metadata_callback(avrc_metadata_callback);
   a2dp_sink.set_on_audio_state_changed(audio_state_changed);
+  a2dp_sink.set_avrc_rn_playstatus_callback(avrc_rn_playstatus_callback);
   a2dp_sink.start("Mazda 323", true);
 
   bt_last_volume = bt_current_volume = a2dp_sink.get_volume();
@@ -381,8 +382,13 @@ static void handleButtonAction(uint8_t pin) {
   else if (pin == BT_BTN_VOL_UP) changeVolume(+BT_VOLUME_STEP);
   else if (pin == BT_BTN_VOL_DOWN) changeVolume(-BT_VOLUME_STEP);
   else if (pin == BT_BTN_PLAYPAUSE) {
-    if (bt_is_playing) a2dp_sink.pause();
-    else a2dp_sink.play();
+    if (bt_is_playing) {
+      a2dp_sink.pause();
+      bt_is_playing = false;
+    } else {
+      a2dp_sink.play();
+      bt_is_playing = true;
+    }
   }
 }
 
@@ -542,8 +548,6 @@ void runErrorMode() { /* e.g. blink an error LED */
 // =======================================================================
 
 void setup() {
-  Serial.begin(115200);
-
   // Buttons
   pinMode(USER_BUTTON_1, INPUT);
   pinMode(USER_BUTTON_2, INPUT);
