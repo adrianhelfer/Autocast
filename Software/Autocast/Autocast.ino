@@ -44,6 +44,30 @@ const int USER_BUTTON_3 = 27;
 const int USER_BUTTON_4 = 34;
 const int USER_BUTTON_5 = 35;
 
+// ---- Bluetooth button configuration ----
+// Set to LOW if your buttons pull the line to GND when pressed.
+#define BUTTON_ACTIVE_LEVEL HIGH
+
+const uint8_t BT_BTN_PREV      = USER_BUTTON_1;
+const uint8_t BT_BTN_PLAYPAUSE = USER_BUTTON_2;
+const uint8_t BT_BTN_NEXT      = USER_BUTTON_5;
+const uint8_t BT_BTN_VOL_DOWN  = USER_BUTTON_4;
+const uint8_t BT_BTN_VOL_UP    = USER_BUTTON_3;
+
+const uint8_t       BT_VOLUME_STEP         = 10;
+const unsigned long BT_REPEAT_DELAY_MS     = 400;  // hold time before repeating
+const unsigned long BT_REPEAT_INTERVAL_MS  = 150;  // repeat rate while held
+
+bool bt_is_connected = false;
+bool bt_is_playing   = false;
+
+static const uint8_t BT_BUTTON_PINS[5] = {
+  USER_BUTTON_1, USER_BUTTON_2, USER_BUTTON_3, USER_BUTTON_4, USER_BUTTON_5
+};
+static bool          btn_last[5]       = {false, false, false, false, false};
+static unsigned long btn_press_time[5] = {0, 0, 0, 0, 0};
+static unsigned long btn_last_repeat[5] = {0, 0, 0, 0, 0};
+
 // Amplifier failure
 const int AMP_FAIL_PIN = 16;
 
@@ -293,8 +317,11 @@ void avrc_metadata_callback(uint8_t id, const uint8_t* text) {
 
 void connection_state_changed(esp_a2d_connection_state_t state, void* ptr) {
   if (state == ESP_A2D_CONNECTION_STATE_CONNECTED) {
+    bt_is_connected = true;
     bt_display_information = BT_NOW_PLAYING;
   } else if (state == ESP_A2D_CONNECTION_STATE_DISCONNECTED) {
+    bt_is_connected = false;
+    bt_is_playing = false;
     bt_display_information = BT_NOT_CONNECTED;
   }
 }
@@ -302,15 +329,20 @@ void connection_state_changed(esp_a2d_connection_state_t state, void* ptr) {
 void audio_state_changed(esp_a2d_audio_state_t state, void* ptr) {
   switch (state) {
     case ESP_A2D_AUDIO_STATE_STARTED:
+      bt_is_playing = true;
       bt_display_information = BT_NOW_PLAYING;
       break;
-    default:
+    default:  // SUSPENDED / STOPPED (older core versions: REMOTE_SUSPEND)
+      bt_is_playing = false;
       break;
   }
 }
 
 void enterBluetoothMode() {
   load_config(BLUETOOTH_CONFIG);
+  bt_is_connected = false;
+  bt_is_playing   = false;
+  syncButtonStates();
 
   i2s_pin_config_t pin_config = {
     .bck_io_num = 26,
@@ -338,10 +370,59 @@ void exitBluetoothMode() {
   delay(200); // try at enterBluetooth or at runBluetooth if better performance has been proven that way
 }
 
+static void changeVolume(int delta) {
+  int v = (int)a2dp_sink.get_volume() + delta;
+  a2dp_sink.set_volume((uint8_t)constrain(v, 0, 127));  // clamp: avoids uint8 wrap-around
+}
+
+static void handleButtonAction(uint8_t pin) {
+  if      (pin == BT_BTN_PREV)      a2dp_sink.previous();
+  else if (pin == BT_BTN_NEXT)      a2dp_sink.next();
+  else if (pin == BT_BTN_VOL_UP)    changeVolume(+BT_VOLUME_STEP);
+  else if (pin == BT_BTN_VOL_DOWN)  changeVolume(-BT_VOLUME_STEP);
+  else if (pin == BT_BTN_PLAYPAUSE) {
+    if (bt_is_playing) a2dp_sink.pause();
+    else               a2dp_sink.play();
+  }
+}
+
+// Call once on mode entry so a button held during the mode switch doesn't fire.
+static void syncButtonStates() {
+  for (int i = 0; i < 5; i++) {
+    btn_last[i] = (digitalRead(BT_BUTTON_PINS[i]) == BUTTON_ACTIVE_LEVEL);
+  }
+}
+
+static void handleBluetoothButtons() {
+  unsigned long now = millis();
+
+  for (int i = 0; i < 5; i++) {
+    uint8_t pin = BT_BUTTON_PINS[i];
+    bool pressed = (digitalRead(pin) == BUTTON_ACTIVE_LEVEL);
+
+    if (pressed && !btn_last[i]) {
+      // Rising edge: a fresh press
+      btn_press_time[i]  = now;
+      btn_last_repeat[i] = now;
+      if (bt_is_connected) handleButtonAction(pin);   // same guard as the old isConnected check
+    }
+    else if (pressed && btn_last[i] &&
+             (pin == BT_BTN_VOL_UP || pin == BT_BTN_VOL_DOWN) &&
+             now - btn_press_time[i]  > BT_REPEAT_DELAY_MS &&
+             now - btn_last_repeat[i] > BT_REPEAT_INTERVAL_MS) {
+      // Held volume button: auto-repeat
+      btn_last_repeat[i] = now;
+      if (bt_is_connected) handleButtonAction(pin);
+    }
+
+    btn_last[i] = pressed;
+  }
+}
+
 void runBluetoothMode() {
 
-  // dimm display at headlight signal
   digitalWrite(DIMM_DISPLAY_PIN, digitalRead(ILLUMINATION_SIGNAL_PIN));
+  handleBluetoothButtons();
 
   bt_current_volume = a2dp_sink.get_volume();
 
